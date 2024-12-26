@@ -9,38 +9,29 @@ import (
 )
 
 type application struct {
+	port        *string
+	staticDir   *string
 	infoLogger  *log.Logger
 	errorLogger *log.Logger
 }
 
 func main() {
-	port := flag.String("port", "8080", "Server port")
-	staticDir := flag.String("static-dir", "./ui/static", "Path to static assets")
+	app := &application{
+		port:        flag.String("port", "8080", "Server port"),
+		staticDir:   flag.String("static-dir", "./ui/static", "Path to static assets"),
+		infoLogger:  log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),
+		errorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+	}
+
 	flag.Parse()
 
-	infoLogger := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	errorLogger := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-
-	app := &application{
-		infoLogger:  infoLogger,
-		errorLogger: errorLogger,
-	}
-
-	mux := http.NewServeMux()
-	fileServer := http.FileServer(http.Dir(*staticDir))
-
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/snippet/view", app.snippetView)
-	mux.HandleFunc("/snippet/create", app.snippetCreate)
-
 	server := &http.Server{
-		Addr:     fmt.Sprintf(":%v", *port),
-		ErrorLog: errorLogger,
-		Handler:  mux,
+		Addr:     fmt.Sprintf(":%v", *app.port),
+		ErrorLog: app.errorLogger,
+		Handler:  app.routes(),
 	}
 
-	infoLogger.Println("Starting on port", *port)
+	app.infoLogger.Println("Starting on port", *app.port)
 	err := server.ListenAndServe()
-	errorLogger.Fatal(err)
+	app.errorLogger.Fatal(err)
 }
