@@ -9,12 +9,14 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+	"github.com/n1hron/snippetbox/internal/models"
 )
 
 type application struct {
 	staticDir   *string
 	infoLogger  *log.Logger
 	errorLogger *log.Logger
+	snippets    *models.SnippetModel
 }
 
 func main() {
@@ -22,19 +24,23 @@ func main() {
 	staticDir := flag.String("static-dir", "./ui/static", "Path to static assets")
 	dsn := flag.String("dsn", "", "PostgreSQL data source name")
 
-	app := &application{
-		staticDir:   staticDir,
-		infoLogger:  log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),
-		errorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-	}
-
 	flag.Parse()
+
+	infoLogger := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLogger := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	db, err := openDB(*dsn)
 	if err != nil {
-		app.errorLogger.Fatal(err)
+		errorLogger.Fatal(err)
 	}
 	defer db.Close()
+
+	app := &application{
+		staticDir:   staticDir,
+		infoLogger:  infoLogger,
+		errorLogger: errorLogger,
+		snippets:    &models.SnippetModel{DB: db},
+	}
 
 	server := &http.Server{
 		Addr:     fmt.Sprintf(":%v", *port),
