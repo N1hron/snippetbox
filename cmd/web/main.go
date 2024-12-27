@@ -13,6 +13,7 @@ import (
 )
 
 type application struct {
+	port        *string
 	staticDir   *string
 	infoLogger  *log.Logger
 	errorLogger *log.Logger
@@ -36,6 +37,7 @@ func main() {
 	defer db.Close()
 
 	app := &application{
+		port:        port,
 		staticDir:   staticDir,
 		infoLogger:  infoLogger,
 		errorLogger: errorLogger,
@@ -43,12 +45,12 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:     fmt.Sprintf(":%v", *port),
+		Addr:     fmt.Sprintf(":%v", *app.port),
 		ErrorLog: app.errorLogger,
 		Handler:  app.routes(),
 	}
 
-	app.infoLogger.Println("Starting on port", *port)
+	app.infoLogger.Println("Starting on port", *app.port)
 	err = server.ListenAndServe()
 	app.errorLogger.Fatal(err)
 }
