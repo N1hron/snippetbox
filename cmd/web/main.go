@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/n1hron/snippetbox/internal/models"
 )
@@ -21,9 +22,14 @@ type application struct {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	port := flag.String("port", "8080", "Server port")
 	staticDir := flag.String("static-dir", "./ui/static", "Path to static assets")
-	dsn := flag.String("dsn", "", "PostgreSQL data source name")
+	dsn := flag.String("dsn", os.Getenv("DSN"), "PostgreSQL data source name")
 
 	flag.Parse()
 
