@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"text/template"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -14,11 +15,12 @@ import (
 )
 
 type application struct {
-	port        *string
-	staticDir   *string
-	infoLogger  *log.Logger
-	errorLogger *log.Logger
-	snippets    *models.SnippetModel
+	port          *string
+	staticDir     *string
+	infoLogger    *log.Logger
+	errorLogger   *log.Logger
+	snippets      *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -42,12 +44,18 @@ func main() {
 	}
 	defer db.Close()
 
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		errorLogger.Fatal(err)
+	}
+
 	app := &application{
-		port:        port,
-		staticDir:   staticDir,
-		infoLogger:  infoLogger,
-		errorLogger: errorLogger,
-		snippets:    &models.SnippetModel{DB: db},
+		port:          port,
+		staticDir:     staticDir,
+		infoLogger:    infoLogger,
+		errorLogger:   errorLogger,
+		snippets:      &models.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	server := &http.Server{
