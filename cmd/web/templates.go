@@ -3,13 +3,21 @@ package main
 import (
 	"path/filepath"
 	"text/template"
+	"time"
 
 	"github.com/n1hron/snippetbox/internal/models"
 )
 
 type templateData struct {
-	Snippet  *models.Snippet
-	Snippets []*models.Snippet
+	CurrentYear int
+	Snippet     *models.Snippet
+	Snippets    []*models.Snippet
+}
+
+func (app *application) newTemplateData() *templateData {
+	return &templateData{
+		CurrentYear: time.Now().Year(),
+	}
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
