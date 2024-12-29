@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"text/template"
 
 	// "text/template"
 
@@ -23,27 +24,27 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, s := range snippets {
-		fmt.Fprintln(w, s)
+	data := templateData{
+		Snippets: snippets,
 	}
 
-	// files := []string{
-	// 	"./ui/html/base.html", // Base template must come first
-	// 	"./ui/html/pages/home.html",
-	// 	"./ui/html/partials/nav.html",
-	// }
+	files := []string{
+		"./ui/html/base.html", // Base template must come first
+		"./ui/html/pages/home.html",
+		"./ui/html/partials/nav.html",
+	}
 
-	// ts, err := template.ParseFiles(files...)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	// }
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 
-	// err = ts.ExecuteTemplate(w, "base", nil)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	// }
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 }
 
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +64,27 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "A specific snippet with id %d:\n%v", id, snippet)
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/pages/home.html",
+		"./ui/html/partials/nav.html",
+		"./ui/html/pages/view.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := templateData{
+		Snippet: snippet,
+	}
+
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
 
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
