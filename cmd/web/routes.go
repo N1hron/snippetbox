@@ -18,6 +18,8 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/snippet/create", app.snippetCreate)
 	router.HandlerFunc(http.MethodPost, "/snippet/create", app.snippetCreatePost)
 
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { app.notFound(w) })
+
 	stardard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 
 	return stardard.Then(router)
