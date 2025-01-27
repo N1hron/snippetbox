@@ -207,7 +207,7 @@ form label {
     display: block;
 }
 
-.error + textarea, .error + input {
+.error:not(:empty) + textarea, .error:not(:empty) + input {
     border-color: #C0392B !important;
     border-width: 2px !important;
 }
