@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"path/filepath"
 	"text/template"
 	"time"
@@ -14,7 +15,7 @@ type templateData struct {
 	Snippets    []*models.Snippet
 }
 
-func (app *application) newTemplateData() *templateData {
+func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
 	}
