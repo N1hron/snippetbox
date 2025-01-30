@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"path/filepath"
 	"text/template"
 	"time"
@@ -16,7 +15,7 @@ type templateData struct {
 	Form        any
 }
 
-func (app *application) newTemplateData(r *http.Request) *templateData {
+func (app *application) newTemplateData() *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
 	}

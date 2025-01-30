@@ -18,7 +18,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Snippets = snippets
 
 	app.render(w, http.StatusOK, "home.html", data)
@@ -42,14 +42,14 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 	data.Snippet = snippet
 
 	app.render(w, http.StatusOK, "view.html", data)
 }
 
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData(r)
+	data := app.newTemplateData()
 
 	data.Form = snippetCreateForm{
 		Expires: 365,
@@ -79,7 +79,7 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	form.CheckField(validator.PermittedInt(form.Expires, 1, 7, 365), "title", "This field must equal 1, 7 or 365")
 	
 	if !form.Valid() {
-		data := app.newTemplateData(r)
+		data := app.newTemplateData()
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "create.html", data)
 		return
