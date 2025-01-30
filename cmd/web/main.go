@@ -9,6 +9,7 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/go-playground/form/v4"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/n1hron/snippetbox/internal/models"
@@ -21,6 +22,7 @@ type application struct {
 	errorLogger   *log.Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder *form.Decoder
 }
 
 func main() {
@@ -56,6 +58,7 @@ func main() {
 		errorLogger:   errorLogger,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder: form.NewDecoder(),
 	}
 
 	server := &http.Server{
